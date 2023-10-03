@@ -31,6 +31,8 @@
   /** The lower bound of the chart. MIN */
   export let lowerBound: number;
   export let reachableRanges: number[];
+  // export lowerRange: number;
+  // export upperRange: number;
 
   /** The higher bound of the chart. MAX */
   export let higherBound: number;
@@ -123,6 +125,7 @@
         },
       },
       //
+      data: [lowerBound],
       //data: [lowerBound, higherBound],
       //data: reachableRanges, // needed?
     },
@@ -139,9 +142,10 @@
         show: false,
       },
       axisPointer: { show: false },
+      //data: 
       //max: 1,
       //data: reachableRanges,
-      data: [reachableRanges],
+      //data: [reachableRanges],
     },
     grid: {
       show: true,
@@ -159,26 +163,24 @@
     addHorizontalBar(option);
   });
 
-  // TODO: Better documentation. Also try to make this more understandable.
+  // TODO: works now with lowerbound being under 0 and upper being under 1
+  // DOEs not work if lowerbound is not less than zero, need to fix.
   function updateBarColor() {
-    let originalBarColor = barColor.slice();
-    let datalowerBar = "blue";
-    let backgroundStyle;
-    // Is this mess necessary?
-    let color = "blue";
 
+    let color = "blue";
+    
     chart.setOption({
       series: [
         {
-          //id: "higher",
+          id: "higher",
           stack: "negative",
           type: "bar",
           color: color,
           backgroundStyle: "white",
           showBackground: false, //aspirationValue ? true : false,
-          data: reachableRanges,
+          data: reachableRanges[0] ? [[reachableRanges[0]]] : [[0]],
           barWidth: "100%",
-          colorBy: "data",
+          //colorBy: "data",
           animation: false,
           // opacity: lowerIsBetter ? 1 : 0.2,
           emphasis: {
@@ -190,6 +192,27 @@
       ],
     });
     // Logic when the bar starts from a negative value (echarts does not support this by default)
+    if (lowerBound < 0) {
+      chart.setOption({
+        series: [
+          {
+            id: "lower",
+            stack: "negative",
+            type: "bar",
+            color: color,
+            animation: false,
+            data: reachableRanges[1] ? [[reachableRanges[1]]] : [[0]],
+            barWidth: "100%",
+            emphasis: {
+              //  eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore -- Error says that disabled doesn't exist in the echarts series type, but in the documentation it exists. Might be because it's a new property, so they have not updated the type yet. https://echarts.apache.org/en/option.html#series-bar.emphasis.disabled
+              disabled: true,
+            },
+          },
+        ],
+      });
+    }
+    
   }
 
   function addHorizontalBar(option: echarts.EChartOption) {
