@@ -47,7 +47,10 @@
   export let currentValue: number | undefined = undefined;
 
   /** The color of the bar. */
-  export let barColor = colorPalette[0];
+  export let objIndex: number;
+  export let iteration: number;
+  export let barColor = colorPalette[objIndex];
+  // to know to which bar to draw the 'iteration i' + colors
 
   /** Whether a lower value is better. */
   //export let lowerIsBetter = true;
@@ -133,7 +136,8 @@
       id: "yAxis",
       type: "category", // setting as continuous removes the weird, only half coloring but does not work correctly with code either.
       axisLabel: {
-        show: false,
+        show: true,
+        formatter:  'Iteration {iteration}'
       },
       axisLine: {
         show: false,
@@ -167,6 +171,7 @@
   // DOEs not work if lowerbound is not less than zero, need to fix.
   function updateBarColor() {
 
+    //let color = barColor; // for some reason this brings two colors?
     let color = "blue";
     
     chart.setOption({
@@ -176,7 +181,7 @@
           stack: "negative",
           type: "bar",
           color: color,
-          backgroundStyle: "white",
+          //backgroundStyle: "white",
           showBackground: false, //aspirationValue ? true : false,
           data: reachableRanges[0] ? [[reachableRanges[0]]] : [[0]],
           barWidth: "100%",
@@ -201,6 +206,7 @@
             type: "bar",
             color: color,
             animation: false,
+            showBackground: false,
             data: reachableRanges[1] ? [[reachableRanges[1]]] : [[0]],
             barWidth: "100%",
             emphasis: {
