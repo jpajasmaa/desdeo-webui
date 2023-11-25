@@ -128,7 +128,7 @@
         },
       },
       //
-      data: [lowerBound],
+      //data: [lowerBound],
       //data: [lowerBound, higherBound],
       //data: reachableRanges, // needed?
     },
@@ -145,6 +145,7 @@
       axisTick: {
         show: false,
       },
+      
       axisPointer: { show: false },
       //data: 
       //max: 1,
@@ -171,8 +172,32 @@
   // DOEs not work if lowerbound is not less than zero, need to fix.
   function updateBarColor() {
 
-    //let color = barColor; // for some reason this brings two colors?
-    let color = "blue";
+    let color = barColor; // for some reason this brings two colors?
+    //let color = "blue";
+    
+    
+    // Logic when the bar starts from a negative value (echarts does not support this by default)
+    if (lowerBound < 0) {
+      console.log("lower bounds less 0")
+      chart.setOption({
+        series: [
+          {
+            id: "lower",
+            stack: "negative",
+            type: "bar",
+            color: color,
+            animation: false,
+            showBackground: false,
+            data: reachableRanges[0] ? [[reachableRanges[0]]] : [[0]],
+            barWidth: "100%",
+            emphasis: {
+              //  eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore -- Error says that disabled doesn't exist in the echarts series type, but in the documentation it exists. Might be because it's a new property, so they have not updated the type yet. https://echarts.apache.org/en/option.html#series-bar.emphasis.disabled
+              disabled: true,
+            },
+          },
+        ],
+      });
     
     chart.setOption({
       series: [
@@ -180,10 +205,11 @@
           id: "higher",
           stack: "negative",
           type: "bar",
-          color: color,
+          color: "red",
+          //color: "red",
           //backgroundStyle: "white",
           showBackground: false, //aspirationValue ? true : false,
-          data: reachableRanges[0] ? [[reachableRanges[0]]] : [[0]],
+          data: reachableRanges[1] ? [[reachableRanges[1]]] : [[0]],
           barWidth: "100%",
           //colorBy: "data",
           animation: false,
@@ -196,29 +222,57 @@
         },
       ],
     });
-    // Logic when the bar starts from a negative value (echarts does not support this by default)
-    if (lowerBound < 0) {
-      chart.setOption({
-        series: [
-          {
-            id: "lower",
-            stack: "negative",
-            type: "bar",
-            color: color,
-            animation: false,
-            showBackground: false,
-            data: reachableRanges[1] ? [[reachableRanges[1]]] : [[0]],
-            barWidth: "100%",
-            emphasis: {
-              //  eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore -- Error says that disabled doesn't exist in the echarts series type, but in the documentation it exists. Might be because it's a new property, so they have not updated the type yet. https://echarts.apache.org/en/option.html#series-bar.emphasis.disabled
-              disabled: true,
-            },
+  }
+  else {
+
+    chart.setOption({
+      series: [
+        {
+          //id: "higher",
+          stack: "positive",
+          type: "bar",
+          color: "red",
+          backgroundStyle: "white",
+          showBackground: false, //aspirationValue ? true : false,
+          //data: [reachableRanges],
+          data: [5],
+          barWidth: "100%",
+          //colorBy: "data",
+          animation: false,
+          // opacity: lowerIsBetter ? 1 : 0.2,
+          emphasis: {
+            //  eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore -- Error says that disabled doesn't exist in the echarts series type, but in the documentation it exists. Might be because it's a new property, so they have not updated the type yet. https://echarts.apache.org/en/option.html#series-bar.emphasis.disabled
+            disabled: true,
           },
-        ],
-      });
-    }
-    
+        },
+      ],
+    });
+    chart.setOption({
+      series: [
+        {
+          //id: "lower",
+          stack: "positive",
+          type: "bar",
+          color: "blue",
+          backgroundStyle: "white",
+          showBackground: false, //aspirationValue ? true : false,
+          //data: [reachableRanges],
+          data: [8],
+          barWidth: "100%",
+          //colorBy: "data",
+          animation: false,
+          // opacity: lowerIsBetter ? 1 : 0.2,
+          emphasis: {
+            //  eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore -- Error says that disabled doesn't exist in the echarts series type, but in the documentation it exists. Might be because it's a new property, so they have not updated the type yet. https://echarts.apache.org/en/option.html#series-bar.emphasis.disabled
+            disabled: true,
+          },
+        },
+      ],
+    });
+  }
+
   }
 
   function addHorizontalBar(option: echarts.EChartOption) {
